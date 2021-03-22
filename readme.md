@@ -24,7 +24,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 
 * <a name ="use"></a> <b>Use</b>: Mostly just a fun program for exploring locations in TESV: Skyrim, however the code does contain a lot of general use code that could be used to scrape other things on the wiki.
 
-#2. <a name="setup"></a>Setup 
+# 2. <a name="setup"></a>Setup 
 1. <a name="python"></a>Install Python3 (the latest version will work)
     * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/ </a>
 2. <a name="libs"></a>Install necessary Libraries\
@@ -55,12 +55,12 @@ build a GUI that creates a more user friendly, navigable format for the idea.
         *       C:\...\SkyrimLocCrawl>pip install subprocess
 <i>Note: Most of these are included with Python, so unless you did a bare bones install most of these will already be included</i>
 
-#3. <a name="starting"></a> Starting for the first time
+# 3. <a name="starting"></a> Starting for the first time
 To start the program for the first time, simply type in the command prompt
 *       C:\...\SkyrimLocCrawl>python skyrimloccrawlgui.py
 Or simply run <i>skyrimloccrawlgui.py</i> in a Python IDE
     
-#4. <a name="methods"></a> Methods, Fields, Classes
+# 4. <a name="methods"></a> Methods, Fields, Classes
 1. <a name="crawl"></a>Methods, fields, and classes in: skyrimloccrawl.py
     * <i>headers</i>
         * Main headers for the crawler, this tells the website what kind of machine you are running by default the value of headers is\
