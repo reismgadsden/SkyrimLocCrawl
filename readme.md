@@ -160,7 +160,7 @@ Or simply run <i>skyrimloccrawlgui.py</i> in a Python IDE
             * Parameters
                 * bs_obj - The BeautifulSoup object the will be used to gather data from the page.
             * Return
-                * Returns the data contained in the first non cited <p> block
+                * Returns the data contained in the first non cited \<p> block
             * Purpose
                 * Get the first descriptive paragraph from the location page.
                 * Strip away any unnecessary tags from said paragraph.
