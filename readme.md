@@ -50,7 +50,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
     * TKinter.ttk
         *       C:\...\SkyrimLocCrawl>pip install tkinter.ttk
     * TKinter.tix
-        *       C:\...\SkyrimLocCrawl>pip install bs4.tkitner,tix
+        *       C:\...\SkyrimLocCrawl>pip install bs4.tkitner.tix
     * Subprocess
         *       C:\...\SkyrimLocCrawl>pip install subprocess
 <i>Note: Most of these are included with Python, so unless you did a bare bones install most of these will already be included</i>
