@@ -112,10 +112,9 @@ This section will give a detailed overview of each feature in the current versio
 ## 1. <a name="search"></a>Reactive Search
 Skyrim Location Crawler includes a reactive search function! Simply enter some text into the search bar to begin!
 <br/>
-<img src="./markdownassets/reactivesearchenter.png" width="50%">
+<img src="./markdownassets/reactiveseachenter.png" width="50%">
 <br/>
 <br/>
-
 Reactive search features include will pull up the first five locations that match. If there are less then five matches for your search it will pull up whatever results there are. Also, if there are no matching searches, it will let you know.
 <br/>
 <img src="./markdownassets/searchresults.png" width="50%">
@@ -123,7 +122,6 @@ Reactive search features include will pull up the first five locations that matc
 <img src="./markdownassets/nonmatchedsearch.png" width="50%">
 <br/>
 <br/>
-
 Clicking on any of these results will allow to view them, regard the <a href="view">next section</a> to learn more about the results.
 
 ## 2. <a name="view"></a>Viewing Results
@@ -153,6 +151,7 @@ To go to the wiki page for the location simply left click on the link at the top
 At the bottom of the wiki page there will be some extra options depending on how you arrived to that page. Below is how to return back to the start page after clicking an element from the reactive search. If you want to learn about the options for results displayed from other ways click one of the following: <a href="all_loc">All locations</a>, <a href="rand_loc">Random location</a>; or simply scroll to the sections below.
 <br/>
 <img src="./markdownassets/singleresultback.png" width="50%">
+
 ## 3. <a name="all_loc"></a>Check out all locations!
 ### <i>Important Note: This application does not support mousewheel scrolling at the current time. If your pages require a scroll bar you will have to click and drag the scroll bar on the right hand side of the page.</i>
 "Check out all locations!" allows you to view a list of all the locations gathered during the crawl and view any of their results to get started simply click "Check out all locations!".
@@ -173,6 +172,7 @@ Once you are done reading about your choosen location you can go back to viewing
 After viewing all the results you wish to view to go back to start page simply click "Go back to search!" at the bottom of the All Locations list. (You might have to scroll pretty far down)
 <br/>
 <img src="./markdownassets/alllocend.png" width="50%">
+
 ## 4. <a name="rand_loc"></a>Check out a random location!
 Skyrim Location Crawler allows you to pull up a random result from all crawled location to get pull up a random result simply click "Check out a random location!"
 <br/>
@@ -182,18 +182,20 @@ Skyrim Location Crawler allows you to pull up a random result from all crawled l
 After pulling up a random result you have two options:
 1. View another random
 <br/>
-<img src="./markdownassets/randomlocresult.png" width="50%">
+<img src="./markdownassets/randomresult.png" width="50%">
 <br/>
 <br/>
 2. Go back to the start page
 <br/>
 <img src="./markdownassets/randomresultback.png" width="50%">
+
 ## 5. <a name="hold_dist"></a>Check out the distributions of locations in each hold!
 Skyrim Location Crawler will also generate a (at the time, poorly) formatted table displaying how many of locations land in each hold, and what percentage each hold has of the total locations crawled.
 <br/>
 <img src="./markdownassets/holddist.png" width="50%">
 <br/>
 <img src="./markdownassets/holddistrender.png" width="50%">
+
 ## 6. <a name="type_dist"></a>Check out the distributions of the types of locations!
 ### <i>Important Note: This application does not support mousewheel scrolling at the current time. If your pages require a scroll bar you will have to click and drag the scroll bar on the right hand side of the page.</i>
 Skyrim Location Crawler will also generate a (also, poorly) formatted table displaying types of the locations crawled, as well as the types percentage of occurrence out of all types.
@@ -201,6 +203,7 @@ Skyrim Location Crawler will also generate a (also, poorly) formatted table disp
 <img src="./markdownassets/typedist.png" width="50%">
 <br/>
 <img src="./markdownassets/typedistrender.png" width="50%">
+
 ## 7. <a name="hold_ref"></a>Check out the handy hold reference table!
 Skyrim Location Crawler will also generate a (you guessed, poorly) formatted table displaying each of the holds, along with their corresponding Jarl and capital city. This data is gathered separately from the main crawl from <a href="https://elderscrolls.fandom.com/wiki/Holds">https://elderscrolls.fandom.com/wiki/Holds</a>
 <br/>
@@ -208,6 +211,7 @@ This table is mostly for fun but can be a handy reference, as well provide some 
 <br/>
 <img src="./markdownassets/holdref.png" width="50%">
 <img src="./markdownassets/holdrefrender.png" width="50%">
+
 ## 8. <a name="json"></a>View JSON
 Skyrim Location Crawler also supports the option to drop all the scraped info into a .json file, called <i>data.json</i>. To do this simply click on "View JSON"
 <br/>
@@ -254,12 +258,13 @@ There are two ways to exit the Skyrim Location Crawler:
 1. Click the X in the top right
 2. Click "Exit Skyrim Location Crawler"
 <br/>
-<img src="./markdownassets/exitscrape" width="50%">
+<img src="./markdownassets/exitscrape.png" width="50%">
 <br/>
 <br/>
 If you choose the second option you will also be sent of with a nice little goodbye (this page stays up for 2 seconds then the application terminates)
 <br/>
-<img src="./markdownassets/goodbye" width="50%">
+<img src="./markdownassets/goodbye.png" width="50%">
+
 # 5. <a name="methods"></a> Methods, Fields, Classes
 ### 1. <a name="crawl"></a>Methods, fields, and classes in: <i>skyrimloccrawl.py</i>
 * <i>headers</i>
