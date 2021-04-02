@@ -122,7 +122,7 @@ Reactive search features include will pull up the first five locations that matc
 <img src="./markdownassets/nonmatchedsearch.png" width="50%">
 <br/>
 <br/>
-Clicking on any of these results will allow to view them, regard the <a href="view">next section</a> to learn more about the results.
+Clicking on any of these results will allow to view them, regard the <a href="#view">next section</a> to learn more about the results.
 
 ## 2. <a name="view"></a>Viewing Results
 This section will give a quick overview of the results that will come up for locations. <i>Note: there will be variations based on how you get to the location, however this a generalized summary of navigating displayed results</i>
@@ -148,7 +148,7 @@ To go to the wiki page for the location simply left click on the link at the top
 <img src="./markdownassets/singleresulturl.png" width="50%">
 <br/>
 <br/>
-At the bottom of the wiki page there will be some extra options depending on how you arrived to that page. Below is how to return back to the start page after clicking an element from the reactive search. If you want to learn about the options for results displayed from other ways click one of the following: <a href="all_loc">All locations</a>, <a href="rand_loc">Random location</a>; or simply scroll to the sections below.
+At the bottom of the wiki page there will be some extra options depending on how you arrived to that page. Below is how to return back to the start page after clicking an element from the reactive search. If you want to learn about the options for results displayed from other ways click one of the following: <a href="#all_loc">All locations</a>, <a href="#rand_loc">Random location</a>; or simply scroll to the sections below.
 <br/>
 <img src="./markdownassets/singleresultback.png" width="50%">
 
