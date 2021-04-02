@@ -8,7 +8,7 @@ build a GUI that creates a more user friendly, navigable format for the idea. It
 - Creating a .json file from the info
 
 @author: Reis Gadsden
-@version: 3/19/21
+@version: v1.1.0
 
 GitHub: https://github.com/reismgadsden
 
@@ -27,6 +27,7 @@ Necessary import for full project:
 """
 
 # needed imports
+import time
 import webbrowser
 from tkinter import font
 from tkinter.ttk import *
@@ -34,6 +35,7 @@ from tkinter.tix import *
 import skyrimloccrawl
 import random
 import subprocess
+import threading
 
 
 # class that builds root window and contains all logic to build following windows
@@ -109,15 +111,14 @@ class SkyrimLocGUI:
                 self.input_error_var.set("Please enter a value of at least one.")
                 self.win.update()
             else:
+                threading.Thread(target=self.init_crawl, args=(sites_crawl_amount,)).start()
                 self.load_crawl(sites_crawl_amount)
-                self.init_crawl(sites_crawl_amount)
 
     # allows for a loading page during crawl
     def load_crawl(self, num_sites):
         # clears frame
         for child in self.win.winfo_children():
             child.destroy()
-
         # sets value to max amount
         if num_sites > 562:
             crawl_site = 562
@@ -125,11 +126,50 @@ class SkyrimLocGUI:
             crawl_site = num_sites
 
         # cute loading message
-        label = Label(self.win, text="Loading " + str(crawl_site) + " Site(s) from https://elderscrolls.fandom.com"
-                                                                    "/wiki/Locations_(Skyrim) (this may take a minute "
-                                                                    "or two)...")
+        loadvar = StringVar()
+        loadvar.set("")
+        waitvar = StringVar()
+        waitvar.set("Loading " + str(crawl_site) + " Site(s) from https://elderscrolls.fandom.com"
+                                                   "/wiki/Locations_(Skyrim) (this may take a minute "
+                                                   "or two)" + loadvar.get())
+        label = Label(self.win, textvariable=waitvar)
         label.pack(side=TOP, pady=10)
-        self.win.update()
+
+        i = 0
+        loadmessagevar = StringVar()
+        loadmessagevar.set("")
+        loadmessagelabel = Label(self.win, textvariable=loadmessagevar)
+        loadmessagelabel.pack(pady=10)
+        loadingmessages = ["Oh man this is taking a while, but I promise it is loading :)",
+                           "Damn bro how many locations did you ask for?",
+                           "Great things come to those who wait :)",
+                           "I promise I am loading I am just trying to be respectful and not overload the servers :(",
+                           "( ͡° ͜ʖ ͡°)", "One day I will load...",
+                           "If you asked for or more than 562 you are going to be here for a few minutes lol.",
+                           "Veuillez patienter, merci beaucoup.",
+                           "While you wait check this out this link ahku.portfoliobox.net",
+                           "Here, while you wait reddit.com"]
+        while True:
+            if self.page_attr == "":
+                time.sleep(0.25)
+                loadvar.set("."*(i % 4))
+                waitvar.set("Loading " + str(crawl_site) + " Site(s) from https://elderscrolls.fandom.com"
+                                                           "/wiki/Locations_(Skyrim) (this may take a minute "
+                                                           "or two)" + loadvar.get())
+                i += 1
+                self.win.update()
+                if i % 25 == 0:
+                    loadmessagevar.set(random.choice(loadingmessages))
+                    loadmessagelabel.unbind("<Button-1>")
+                    if "ahku.portfoliobox.net" in loadmessagevar.get():
+                        loadmessagelabel.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://ahku.portfoliobox.net/"))
+                    elif "reddit.com" in loadmessagevar.get():
+                        loadmessagelabel.bind("<Button-1>",
+                                              lambda e: webbrowser.open_new_tab("https://www.reddit.com/"))
+                    if i % 50 == 0:
+                        loadmessagevar.set("")
+            else:
+                break
 
     # initializes the actual crawl of websites and pushes data to page_attr to be used else where
     # also loads up the main start page
@@ -392,8 +432,6 @@ class SkyrimLocGUI:
                     label_go_back.pack(pady=10)
                     label_go_back.bind('<Button-1>', lambda e: self.start_page())
 
-                break
-
     # builds a page that contain links to all locations that were crawled
     def view_all_results(self):
         # clear all elements from frame
@@ -457,7 +495,7 @@ class SkyrimLocGUI:
 
         # formatted output for hold summary (surprisingly okay formatting considering the other table)
         hold_sum = self.crawler.get_hold_summary()
-        output = "{0:<35}\t{1:<20}{2:>32}\n\n".format("Type", "Occurrences", "Percentage of Total Occurrences")
+        output = "{0:<35}\t{1:<20}{2:>32}\n\n".format("Hold", "Occurrences", "Percentage of Total Occurrences")
         for key in hold_sum:
             output += '{0:<35}\t{1:<20}{2:>32}\n'.format(key, hold_sum[key],
                                                          str((hold_sum[key] / self.crawler.hold_sum) * 100) + "%")
