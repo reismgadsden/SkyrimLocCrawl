@@ -225,10 +225,10 @@ If a .json has not already been created it will display a message and open up th
 <img src="./markdownassets/jsonloc.png" width="50%">
 <br/>
 <br/>
-Data.json will be formatted like as the following:
+Data.json will be formatted like the following:
 <pre><code>
 {
-<br/>   "https://elderscrolls.fandom.com/wiki/First_Location)URL" :
+<br/>   "https://elderscrolls.fandom.com/wiki/First_Location_URL" :
 <br/>   {
 <br/>       "Location Name: ": <i>"First_Location_Name"</i>,
 <br/>       "Location Type: ": <i>"First_Location_Type"</i>,
