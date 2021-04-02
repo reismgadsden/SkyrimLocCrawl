@@ -417,7 +417,7 @@ Main class of the crawler. Contains everything to do with the actual crawling of
 * main
     * Purpose
         * Was useful in v0 as whole program ran in the console. Gathered and validated user input. It is now a deprecated function.
-### 2. <a name="gui"></a>Methods, fields, and classes in: skyrimloccrawlgui.py
+### 2. <a name="gui"></a>Methods, fields, and classes in: <i>skyrimloccrawlgui.py</i>
 * <b>SkyrimLocGUI (Class)</b>
     * <i>page_attr</i>
         * Dictionary designed to hold all data stored by using the URL as the key, and having another dictionary containing all attributes as the associated value.
