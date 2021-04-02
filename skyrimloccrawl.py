@@ -8,7 +8,7 @@ build a GUI that creates a more user friendly, navigable format for the idea. It
 - Creating a .json file from the info
 
 @author: Reis Gadsden
-@version: 3/19/21
+@version: v1.1.0
 
 GitHub: https://github.com/reismgadsden
 
