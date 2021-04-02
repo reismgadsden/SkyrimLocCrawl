@@ -81,13 +81,13 @@ class SkyrimLocGUI:
         btn = Button(self.win, text="Crawl!")
         btn.pack(pady=10)
         btn.bind("<Button>", lambda b: self.start_crawl(number_to_crawl.get()))
-        self.master.title("Skyrim Location Scraper")
+        self.master.title("Skyrim Location Crawler")
         self.input_error_var = StringVar()
         self.input_error_var.set("")
         self.error_label = Label(self.win, textvariable=self.input_error_var)
         self.error_label.pack()
         self.pgf = font.Font(size=10)
-        self.progname_label = Label(self.win, text="Skyrim Location Scraper", font=self.pgf, foreground="#828282")
+        self.progname_label = Label(self.win, text="Skyrim Location Crawler", font=self.pgf, foreground="#828282")
         self.progname_label.pack()
         self.nf = font.Font(size=10)
         self.name_label = Label(self.win, text="Reis Gadsden - 2021", font=self.nf, foreground="#828282")
@@ -261,7 +261,7 @@ class SkyrimLocGUI:
         dump_label = Label(self.win, textvariable=self.json_var)
         dump_label.pack(pady=10)
 
-        quit_label = Label(self.win, text="Exit Skyrim Location Scraper", font='Verdana 11 underline',
+        quit_label = Label(self.win, text="Exit Skyrim Location Crawler", font='Verdana 11 underline',
                            foreground="#0000ee")
         quit_label.pack(pady=20)
         quit_label.bind('<Button-1>', lambda e: self.quit())
@@ -547,7 +547,7 @@ class SkyrimLocGUI:
         for child in self.win.winfo_children():
             child.destroy()
 
-        goodbye = Label(self.win, text="Goodbye!\nThank you for using the Skyrim Location Scraper!",
+        goodbye = Label(self.win, text="Goodbye!\nThank you for using the Skyrim Location Crawler!",
                         font="Verdana 30", justify=CENTER)
         goodbye.pack()
         self.master.after(2000, self.master.destroy)
