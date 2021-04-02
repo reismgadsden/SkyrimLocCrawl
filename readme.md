@@ -27,10 +27,10 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 
 * <a name ="use"></a> <b>Use</b>: Mostly just a fun program for exploring locations in TESV: Skyrim, however the code does contain a lot of general use code that could be used to scrape other things on the wiki.
 
-#2. <a name="setup"></a>Setup 
-###1. <a name="python"></a>Install Python3
+# 2. <a name="setup"></a>Setup 
+### 1. <a name="python"></a>Install Python3
     * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/ </a>
-###2. <a name="libs"></a>Install necessary Libraries
+### 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
 * BeautifulSoup
     *       C:\...\SkyrimLocCrawl>pip install bs4
@@ -62,13 +62,13 @@ Open up your local machines command prompt and navigate to the directory where y
     *       C:\...\SkyrimLocCrawl>pip install subprocess
 <i>Note: Most of these are included with Python, so unless you did a bare bones install most of these will already be included</i>
 
-#3. <a name="starting"></a> Starting for the first time
-###1. <a name="initializing"></a> Starting the program.
+# 3. <a name="starting"></a> Starting for the first time
+### 1. <a name="initializing"></a> Starting the program.
 To start the program for the first time, simply type in the command prompt
 *       C:\...\SkyrimLocCrawl>python skyrimloccrawlgui.py
 Or simply run <i>skyrimloccrawlgui.py</i> in a Python IDE.
 
-##2. <a name="walkthrough"></a> Walkthrough
+## 2. <a name="walkthrough"></a> Walkthrough
 Upon starting you will be greeted by the following welcome screen.
 
 
@@ -98,10 +98,10 @@ Once the crawler is finished you will land on this page.
 <img src="./markdownassets/startpage.png" width="50%">
 
 
-##3. <a name="features"></a>Exploring the features
+## 3. <a name="features"></a>Exploring the features
     
-#4. <a name="methods"></a> Methods, Fields, Classes
-###1. <a name="crawl"></a>Methods, fields, and classes in: <i>skyrimloccrawl.py</i>
+# 4. <a name="methods"></a> Methods, Fields, Classes
+### 1. <a name="crawl"></a>Methods, fields, and classes in: <i>skyrimloccrawl.py</i>
 * <i>headers</i>
     * Main headers for the crawler, this tells the website what kind of machine you are running by default the value of headers is\
     <pre><code>headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'}</code></pre>
@@ -252,7 +252,7 @@ Main class of the crawler. Contains everything to do with the actual crawling of
 * main
     * Purpose
         * Was useful in v0 as whole program ran in the console. Gathered and validated user input. It is now a deprecated function.
-###2. <a name="gui"></a>Methods, fields, and classes in: skyrimloccrawlgui.py
+### 2. <a name="gui"></a>Methods, fields, and classes in: skyrimloccrawlgui.py
 * <b>SkyrimLocGUI (Class)</b>
     * <i>page_attr</i>
         * Dictionary designed to hold all data stored by using the URL as the key, and having another dictionary containing all attributes as the associated value.
