@@ -495,7 +495,7 @@ class SkyrimLocGUI:
 
         # formatted output for hold summary (surprisingly okay formatting considering the other table)
         hold_sum = self.crawler.get_hold_summary()
-        output = "{0:<35}\t{1:<20}{2:>32}\n\n".format("Type", "Occurrences", "Percentage of Total Occurrences")
+        output = "{0:<35}\t{1:<20}{2:>32}\n\n".format("Hold", "Occurrences", "Percentage of Total Occurrences")
         for key in hold_sum:
             output += '{0:<35}\t{1:<20}{2:>32}\n'.format(key, hold_sum[key],
                                                          str((hold_sum[key] / self.crawler.hold_sum) * 100) + "%")
