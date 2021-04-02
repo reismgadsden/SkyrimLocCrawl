@@ -1,563 +1,445 @@
 """
-SKYRIM LOCATION CRAWLER GUI
+SKYRIM LOCATION CRAWLER
 
-This program will take data collected in a scrape from the locations on the Elder Scrolls Wiki page for Skyrim and
-build a GUI that creates a more user friendly, navigable format for the idea. It allows varies functions including:
-- Displaying random locations
-- Displaying hold and type data summaries for all info gathered
-- Creating a .json file from the info
+This program will crawl the Locations on the Skyrim wiki for a user defined amount of
+times at random and return back some basic info on the locations such as url, name, location type,
+hold, relative location, location id(s), and a quick summary given on the page.
 
 @author: Reis Gadsden
-@version: v1.1.0
+@version: v1.0.2
 
-GitHub: https://github.com/reismgadsden
+Attributes Scraped:
+URL - URL of item page crawled to
+Name - Name of the location
+Location Type - What type the location is such as Cave, Shop, etc.
+Relative Location - Some locations gave a location relative in the world
+LocationID(s) - Reference ID used in game, important for modding and console commands
+Summary - Typically the first <p> tag, gives a short summary of the location
 
-Necessary import for full project:
--bs4.BeautifulSoup
--urllib.robotparser.RobotFileParser
--pip._vendor.requests
--random.*
--json.*
--collections.OrderedDict
--webbrowser.*
--tkinter.font
--tkinter.ttk.*
--tkinter.tix.**
--subprocess.*
+Additional Data Included:
+Hold Lookup Table - A small table stating the hold, its capital city, and its jarl, for each hold in game
+Hold Summary Table - A small table that shows the distribution of locations in hold for crawled pages
+
+Important Base Links:
+Base Crawl Page - https://elderscrolls.fandom.com/wiki/Locations_(Skyrim)
+Hold Lookup Table Page - https://elderscrolls.fandom.com/wiki/Holds
+
+Five Base Links:
+(I would like to note this program crawls based on user generated input at random. You could crawl 1 page, or you could
+crawl all 562 base locations in Skyrim, each time the crawler will choose random locations, for example if you crawl
+five times, and then crawl five times again, you only have (1/562)^5  or 0.00000000000179% chance of getting the same
+exact links not even in the same order, mind you. However, I included some of the location links as it was specified in
+the instructions.)
+- https://elderscrolls.fandom.com/wiki/Whiterun_Marketplace
+- https://elderscrolls.fandom.com/wiki/Horgeir%27s_House
+- https://elderscrolls.fandom.com/wiki/Talking_Stone_Camp
+- https://elderscrolls.fandom.com/wiki/Heimskr%27s_House
+- https://elderscrolls.fandom.com/wiki/Dead_Men%27s_Respite
+
+Additional work that allows this project to exceed a B:
+- Used user generated input.
+- Got a random assortment of items instead of predefined ones.
+- Said random assortment is based of the user defined input.
+- Exception handling of all types, including, but not limited to:
+    - Constraints on user input such as:
+        - Negative numbers
+        - Strings
+        - Zero value
+        - Blank value
+        - Values exceeding total number of locations
+    - Modifying and cleaning up attributes from sites that were not all formatted the same as it is a fandom wiki,
+      meaning each page is created by different users, which results in wonky and inconsistent formatting,
+      however formatting was cleaned up in order to provide uniform output. (THERE WAS A LOT OF THIS!!!)
+    - Possible exceptions in the data gathered from the website such as an attribute not existing rather then just
+      printing None.
+    - Alternative ways of searching for data such as in the get_hold method, in which if hold could not be found it
+      searched the summary paragraph in order to see if there was a mention of hold or city in which we could deduce
+      was the hold the location was in.
+    - Possible exceptions that might rise from dumping to .json file.
+- Adding the hold summary table, which gives some statistical data on attributes gathered during crawl
+  also, I just thought it was a cute feature.
+- Adding the type summary table, which gives some statistical data on attributes gathered during crawl, and yes,
+  I also thought it was just a cute feature
+- Implementing the use of my table data in methods for getting attributes, giving more purpose the data.
+- Generally clean and readable formatting of output to console.
+
+
+Linked Resources:
+https://www.crummy.com/software/BeautifulSoup/bs4/doc/ (using select)
+https://stackabuse.com/formatting-strings-with-python/ (formatting strings)
+https://docs.python.org/3/library/json.html#exceptions (handling json exception)
+https://www.geeksforgeeks.org/randomly-select-elements-from-list-without-repetition-in-python/
+https://stackoverflow.com/questions/55590092/replace-br-with-space-in-beautifulsoap-output/55590217 (get_text separator)
 """
 
 # needed imports
-import time
-import webbrowser
-from tkinter import font
-from tkinter.ttk import *
-from tkinter.tix import *
-import project_one_reis_gadsden
+from bs4 import BeautifulSoup
+from urllib.robotparser import RobotFileParser
+from pip._vendor import requests
 import random
-import subprocess
-import threading
+import json
+from collections import OrderedDict
+
+# necessary initializations
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'}
+rp = RobotFileParser()
+init_url = "https://elderscrolls.fandom.com/wiki/Locations_(Skyrim)"
 
 
-# class that builds root window and contains all logic to build following windows
-class SkyrimLocGUI:
-    # values that are needed in entire class scope (initializing here to suppress soft warnings)
-    page_attr = ""
-    dumped = False
-    crawler = ""
-    e1var = ""
-    s1var = ""
-    s2var = ""
-    s3var = ""
-    s4var = ""
-    s5var = ""
-    json_var = ""
-    search_label1 = ""
-    search_label2 = ""
-    search_label3 = ""
-    search_label4 = ""
-    search_label5 = ""
+# will parse robots.txt and return boolean value based on if site be crawled
+def get_rp(robot_url):
+    # print("Robots.txt page: " + robot_url)
+    r = requests.get(robot_url, headers=headers)
+    rp.parse(r.text)
+    return rp.can_fetch('*', robot_url)
 
-    # creates starting window upon initial class call
-    def __init__(self):
-        # builds main window
-        self.master = Tk()
-        self.frame = Frame(width=1280, height=720)
-        self.frame.pack()
 
-        # allows for scrolling in case of overflowing (pretty much only happens on type summary, and view all page)
-        swin = ScrolledWindow(self.frame, width=1280, height=720)
-        swin.pack()
-        self.win = swin.window
+# will attempt to fetch provided url and will return the necessary BeautifulSoup object if it can fetch the site
+# returns false if it is not reachable
+def get_page(page_url, site_count=None):
+    if page_url == init_url:
+        pass
+        # print("Base page: " + page_url)
+    else:
+        pass
+        # print(str(site_count) + ". Crawled to: " + page_url)
+    if rp.can_fetch('*', page_url):
+        pr = requests.get(page_url, headers=headers)
+        bs = BeautifulSoup(pr.text, "html.parser")
+        return bs
+    else:
+        return False
 
-        # builds main elements of starting page
-        label = Label(self.win, text="Welcome to the Skyrim Location Crawler!", font=50)
-        label.pack(side=TOP, pady=10)
-        label2 = Label(self.win,
-                       text="Please enter an integer value of the number of sites you would like to crawl to")
-        label2.pack(side=TOP)
 
-        number_to_crawl = Entry(self.win, width=52)  # entry for amount to crawl
-        number_to_crawl.pack(side=TOP, pady=10)
-        btn = Button(self.win, text="Crawl!")
-        btn.pack(pady=10)
-        btn.bind("<Button>", lambda b: self.start_crawl(number_to_crawl.get()))
-        self.master.title("Skyrim Location Scraper")
-        self.input_error_var = StringVar()
-        self.input_error_var.set("")
-        self.error_label = Label(self.win, textvariable=self.input_error_var)
-        self.error_label.pack()
-        self.pgf = font.Font(size=10)
-        self.progname_label = Label(self.win, text="Skyrim Location Scraper", font=self.pgf, foreground="#828282")
-        self.progname_label.pack()
-        self.nf = font.Font(size=10)
-        self.name_label = Label(self.win, text="Reis Gadsden - 2021", font=self.nf, foreground="#828282")
-        self.name_label.pack()
-        self.git_label = Label(self.win, text="GitHub - reismgadsden", foreground="#8282ee")
-        self.gitf = font.Font(self.git_label, self.git_label.cget('font'))
-        self.gitf.configure(underline=True, size=10)
-        self.git_label.configure(font=self.gitf)
-        self.git_label.pack()
-        self.git_label.bind('<Button-1>', lambda e: webbrowser.open_new_tab("https://github.com/reismgadsden"))
+# crawler class that contains main logic for crawling and parsing information into readable format
+class Crawler:
+    # necessary initializations for crawler class
+    page_attr = dict()
+    links = []
+    robot_page = ""
+    robot_check = False
+    base_page = ""
+    crawl_page = ""
+    hold_page = ""
+    sites_to_crawl = 0
+    hold_list = []
+    city_list = []
+    jarl_list = []
+    type_sum = 0
+    hold_sum = 0
 
-    # validates input for crawl amount
-    def start_crawl(self, num_crawl):
+    # constructor for crawler class, does some neat stuff such as getting base url, robot url, and calling
+    # functions for a simple main method
+    def __init__(self, base_url, sites_to_crawl):
+        self.sites_to_crawl = sites_to_crawl
+        self.crawl_page = base_url
+        for site in base_url.split('/'):
+            if "https:" in site:
+                self.base_page += site + "//"
+            else:
+                self.base_page += site
+            if ".com" in site:
+                break
+        self.robot_page = self.base_page + "/robots.txt"
+        self.hold_page = self.base_page + "/wiki/Holds"
+        # print("Base site & robots.txt: ")
+        self.robot_check = get_rp(self.robot_page)
+        if self.robot_check:
+            self.populate_links(self.crawl_page)
+            self.get_info()
+            # self.format_print()
+        else:
+            # just in case robots.txt cannot be parsed, or if user is not allowed to crawl.
+            # not sure what would cause this besides ip bans but i figured i should let the user know there is an
+            # issue.
+            print("Robots.txt specifies that this site cannot be crawled :(")
+
+    # populates the links list with links that can be crawled to
+    def populate_links(self, base_link):
+        bs = get_page(base_link)
+        # print("\nCrawled Sites: ")  # fun formatting :)
+        bs.find('div', {'class': 'mw-parser-output'}).find('table').extract()  # gets rid of pesky table at start
+        crawlable_links = set()
+
+        # keeps and index of how many non repeated location links there are.
+        # this is necessary because in the main body links are repeated and also there are links that are not locations
+        # at the end of the page such as links to forums and bugs.
+        for c in bs.find('div', {'class': 'mw-parser-output'}).find_all('li'):
+            if "Dawnguard" == c.find('a').get_text().strip():  # first occurrence of non-location link in <li>
+                break
+            # cast links to set in order to remove duplicates
+            crawlable_links.add(c.find('a').attrs['href'])
+
+        # if user entered a value greater then the number of pages there are it will default to the total number
+        # of crawlable page.
+        if self.sites_to_crawl > len(crawlable_links):
+            self.sites_to_crawl = len(crawlable_links)
+
+        # populates the list with random choices from crawlable links, makes sure not duplicate
+        while len(self.links) < self.sites_to_crawl:
+            rand_choice = random.choice(tuple(crawlable_links))  # cast to tuple because random.choice doesnt do sets
+            # check if none just to be safe
+            if rand_choice is not None \
+                    and self.base_page + rand_choice not in self.links:
+                self.links.append(self.base_page + rand_choice)
+
+    # the following three methods fill lists from a table, these lists are one to one such that each index of each list
+    # corresponds to the information found in the other lists
+
+    # method that fills a list with all names of holds from table
+    def get_holds(self, bs_obj):
+        for hold in bs_obj.find('table', {'class': 'wikitable sortable'}).find('tbody').find_all('tr')[1:]:
+            self.hold_list.append(hold.find_all('td')[0].get_text().strip().split('\n')[0])
+
+    # method that fills a list with all names of cities from table
+    def get_cities(self, bs_obj):
+        for city in bs_obj.find('table', {'class': 'wikitable sortable'}).find('tbody').find_all('tr')[1:]:
+            self.city_list.append(city.find_all('td')[1].get_text().strip().split('\n')[0])
+
+    # method that fills a list with all names of jarls from table
+    def get_jarls(self, bs_obj):
+        for jarl in bs_obj.find('table', {'class': 'wikitable sortable'}).find('tbody').find_all('tr')[1:]:
+            self.jarl_list.append(jarl.find_all('td')[2].get_text().strip().split('\n')[0])
+
+    # method that condenses all calls to methods that gather the necessary information, appends to main dictionary
+    def get_info(self):
+        site_count = 1
+        bs = get_page(self.hold_page, site_count)
+        self.get_holds(bs)
+        self.get_cities(bs)
+        self.get_jarls(bs)
+        for link in self.links:
+            loc_data = dict()
+            site_count += 1
+            bs = get_page(link, site_count)
+            loc_data["Location Name: "] = self.get_loc_name(bs).replace("\xa0", " ")
+            loc_data["Location Type: "] = self.get_loc_type(bs).replace("\xa0", " ")
+            loc_data["Hold: "] = self.get_hold(bs).replace("\xa0", " ")
+            loc_data["Relative Location: "] = self.get_loc(bs).replace("\xa0", " ")
+            loc_data["Location ID(s): "] = self.get_loc_ids(bs).replace("\xa0", " ")
+            loc_data["Summary: "] = self.get_summary(bs).replace("\xa0", " ")
+            self.page_attr[link] = loc_data
+
+    # gets the name of the location which is the only constant similarity in structure between pages
+    def get_loc_name(self, bs_obj):
+        loc_name = bs_obj.find('h1', {'id': 'firstHeading'}).get_text().replace("(Skyrim)", "")\
+            .replace("(Skyrim Location)", "").replace("(Location)", "").strip()
+        return loc_name
+
+    # gets the summary of the location which is usually the first paragraph in the main body, handles fringe cases
+    # where it is not the first paragraph.
+    def get_summary(self, bs_obj):
+        # some times the first paragraph will have an 'aside' tag nested in it.
+        # this will remove the aside tage leaving only the first paragraph
+        if bs_obj.find('div', {'class': 'mw-parser-output'}).find('aside') is not None:
+            bs_obj.find('div', {'class': 'mw-parser-output'}).find('aside').extract()
+        # sets value of summary to text contained in first paragraph
+        summary = bs_obj.find('div', {'class': 'mw-parser-output'}).find('p').get_text().strip()
+
+        # handles cases where first paragraph is NOT the summary, if the first paragraph is not the summary
+        # summary will always return an empty string. Allowing us to deduce that the summary is in the next
+        # paragraph tag. It could be possible that it is not the second paragraph tag however running this program
+        # many times never resulted in this, it was always the first or second paragraph tag.
+        if summary == "":
+            summary = bs_obj.find('div', {'class': 'mw-parser-output'}).find_all('p')[1].get_text().strip()
+
+        return summary
+
+    # will return the hold that the location belongs to. will attempt to handle the fringe cases where a hold is not
+    # specified.
+    def get_hold(self, bs_obj):
+        holds = bs_obj.find_all('div', {"class": "pi-item pi-data pi-item-spacing pi-border-color"})
+
+        # it is necessary to include this as sometimes a table is not given for the location
+        if holds is not None:
+            for hold in holds:
+                # it is necessary to include the first conditional as sometimes the table will contain data that
+                # does not have a corresponding h3 tag, such as a quote or link to another article.
+                if hold.find('h3') is not None and hold.find('h3').get_text().strip() == "Hold":
+                    # weird replaces as the formatting is not uniform for each page, this covers fringe cases and allows
+                    # all data in hold fields to be formatted the same
+
+                    if hold.find('div').get_text(separator=", ").strip().replace(" Hold", "").split(", ")[0] \
+                            in self.hold_list:
+                        # necessary to replace Hold as sometimes the hold is titled "x Hold"
+                        return hold.find('div').get_text(separator=", ").strip().replace(" ,", "")\
+                            .replace(",  Hold", "").replace(" Hold", "")
+
+                    elif hold.find('div').get_text(separator=", ").strip().replace(" Hold", "").split(", ")[0] \
+                            in self.city_list:
+                        return self.hold_list[self.city_list.index(hold.find('div').get_text(separator=", ")
+                                                                   .strip().replace(" ,", "").replace(",  Hold", "")
+                                                                   .replace(" Hold", ""))]
+
+        # these two loops will search the summary for an instance where either a hold or a city is specified
+
+        # this loop will search for an instance of hold in the summary
+        for hold_search in self.hold_list:
+            if hold_search in bs_obj.find('div', {'class': 'mw-parser-output'}).find('p').get_text().strip():
+                return hold_search
+
+        #  this loop will search for instance of city being stated in the summary if the hold is not
+        # if a city is found it will get the corresponding hold to the city
+        for city_search in self.city_list:
+            if city_search in bs_obj.find('div', {'class': 'mw-parser-output'}).find('p').get_text().strip():
+                return self.hold_list[self.city_list.index(city_search)]
+
+        # this will only happen if a hold is not located anywhere in the table or the summary
+        # it still says to check the summary just in case it is located in a village or other location that implies
+        # the hold it is located in
+        return "Hold was not able to be found, summary might give some insight on the hold."
+
+    # this returns a relative location in the world. some pages include a specific location such as
+    # "in the southwest of skyrim", or specific location in a city if it is located in one on top of giving the hold.
+    def get_loc(self, bs_obj):
+        locs = bs_obj.find_all('div', {"class": "pi-item pi-data pi-item-spacing pi-border-color"})
+
+        # it is necessary to include this as sometimes a table is not given for the location
+        if locs is not None:
+            for loc in locs:
+                # it is necessary to include the first conditional as sometimes the table will contain data that
+                # does not have a corresponding h3 tag, such as a quote or link to another article.
+                if loc.find('h3') is not None and loc.find('h3').get_text().strip() == "Location":
+                    return loc.find('div').get_text().strip()
+        # often a lot of places dont have specific locations specified so this is for those cases
+        return "No relative location is specified."
+
+    def get_loc_type(self, bs_obj):
+        loc_types = bs_obj.find_all('div', {"class": "pi-item pi-data pi-item-spacing pi-border-color"})
+
+        # it is necessary to include this as sometimes a table is not given for the location
+        if loc_types is not None:
+            for loc_type in loc_types:
+                # it is necessary to include the first conditional as sometimes the table will contain data that
+                # does not have a corresponding h3 tag, such as a quote or link to another article.
+                if loc_type.find('h3') is not None and loc_type.find('h3').get_text().strip() == "Type":
+                    # this return statement includes a separator as sometimes there is multiple location types
+                    # separated by a <br> tag.
+                    # this conditional checks for a shop in the name as for some reason shop and the type of shop
+                    # as well as legion and 's camps in the imperial camps are separated by a random whitespace,
+                    # this conserves appropriate formatting
+                    if "shop" in loc_type.find('div').get_text(separator=", ").strip().lower()\
+                            or "legion" in loc_type.find('div').get_text(separator=", ").strip().lower():
+                        return loc_type.find('div').get_text().strip().replace("shop", "Shop")
+                    else:
+                        # since pages are inconsistently formatted replace statements were utilized for uniformity also,
+                        # occasionally there will be a weird whitespace character causing the separator to add a
+                        # blankspace followed by a comma, this else statement covers these cases
+                        return loc_type.find('div').get_text(separator=", ").strip().replace(" ,", "")\
+                            .replace(",  ", "").replace("HouseRuin", "House, Ruin")\
+                            .replace("/", ", ").replace("home", "Home").replace(" (Skyrim)", "")\
+                            .replace(" (Solitude)", "").replace("Cave, , Barrow", "Cave, Barrow")
+
+        # handles the fringe cases where no type is attributed to a location, this is rare but there are some pages that
+        # dont include a type
+        return "No location type is attributed to this location."
+
+    # this method gets an attribute called 'LocationIDs' this is important in game as it is the games way of referencing
+    # a location in game, this gets all IDs associated with a location and formats accordingly
+    def get_loc_ids(self, bs_obj):
+        loc_ids = bs_obj.select_one('td[data-source = "LocationID"]')
+        if loc_ids is not None:
+            return loc_ids.get_text(separator=", ").strip()
+        return "This location has no associated Location ID(s)."
+
+    # this method gets all the holds in locations and sums up how many locations are located in each hold
+    # also iterates a field so we can get a total of hold occurrences
+    def get_hold_summary(self):
+        self.hold_sum = 0
+        hold_summary = dict()
+        for hold in self.hold_list:
+            hold_summary[hold] = 0
+        hold_summary["N/A"] = 0  # cases for when hold is not specified
+        for key in self.page_attr:
+            if self.page_attr[key]["Hold: "] != \
+                    "Hold was not able to be found, summary might give some insight on the hold." \
+                    and len(self.page_attr[key]["Hold: "].split(", ")) <= 1:
+                hold_summary[self.page_attr[key]["Hold: "]] += 1
+                self.hold_sum += 1
+
+            # conditional for the fringe case where a location has more then one hold
+            elif self.page_attr[key]["Hold: "] != \
+                    "Hold was not able to be found, summary might give some insight on the hold." and \
+                    len(self.page_attr[key]["Hold: "].split(", ")) > 1:
+                for h in self.page_attr[key]["Hold: "].split(", "):
+                    hold_summary[h] += 1
+                    self.hold_sum += 1
+            else:
+                hold_summary["N/A"] += 1
+                self.hold_sum += 1
+        return hold_summary
+
+    # this method gets all the location types and sums up how many location types there are in total
+    # also iterates a field so we can get a total of location type occurrences
+    def get_type_summary(self):
+        self.type_sum = 0
+        type_summary = dict()
+        # populates a dictionary with all location types
+        # only does this for existing links as to save space in console
+        for key in self.page_attr:
+            if self.page_attr[key]["Location Type: "] == "No location type is attributed to this location.":
+                type_summary["N/A"] = 0
+            elif len(self.page_attr[key]["Location Type: "].split(", ")) <= 1:
+                type_summary[self.page_attr[key]["Location Type: "]] = 0
+            else:
+                for val in self.page_attr[key]["Location Type: "].split(", "):
+                    type_summary[val] = 0
+
+        # gets count of all location types
+        # adds to N/A value if no type is specified
+        for key in self.page_attr:
+            if self.page_attr[key]["Location Type: "] == "No location type is attributed to this location.":
+                type_summary["N/A"] += 1
+                self.type_sum += 1
+            # case if there is more then one type attributed to the location
+            elif len(self.page_attr[key]["Location Type: "].split(", ")) <= 1:
+                type_summary[self.page_attr[key]["Location Type: "]] += 1
+                self.type_sum += 1
+            # handles standard case of one none N/A type
+            else:
+                for val in self.page_attr[key]["Location Type: "].split(", "):
+                    type_summary[val] += 1
+                    self.type_sum += 1
+
+        # returns a dictionary that has keys sorted alphabetically
+        return OrderedDict(sorted(type_summary.items()))
+
+    # attempts to dump all second level dictionaries to a .json file
+    def dump_to_json(self):
+        # attempts to dump to json file
         try:
-            sites_crawl_amount = int(num_crawl)
+            with open('data.json', 'w') as fp:
+                json.dump(self.page_attr, fp, indent=4)
+            fp.close()
+        except json.JSONDecodeError:
+            print("Error dumping to JSON file :(")
+        else:
+            # print("\nSuccessfully dumped " + str(self.sites_to_crawl) + " dictionaries to a JSON file!")
+            pass
+
+
+# main method to get user input and initialize an instance of the crawler class
+def main():
+    print("Welcome to the Skyrim Location Crawler!\n")
+    # this loop gets user input and checks to make sure it is valid input.
+    # only possible invalid input are integers that are too large but these are handled later
+    # in the crawler class itself.
+    while True:
+        sites_crawl_amount = input("Please enter an integer value of the number of sites you would like to crawl to: ")
+        try:
+            sites_crawl_amount = int(sites_crawl_amount)
         except ValueError:
-            self.input_error_var.set("Please enter an integer value.")
-            self.win.update()
+            print("Please enter an integer value.\n")
         else:
             if sites_crawl_amount < 1:
-                self.input_error_var.set("Please enter a value of at least one.")
-                self.win.update()
+                print("Please enter a value of at least one.\n")
             else:
-                threading.Thread(target=self.init_crawl, args=(sites_crawl_amount,)).start()
-                self.load_crawl(sites_crawl_amount)
-
-    # allows for a loading page during crawl
-    def load_crawl(self, num_sites):
-        # clears frame
-        for child in self.win.winfo_children():
-            child.destroy()
-        # sets value to max amount
-        if num_sites > 562:
-            crawl_site = 562
-        else:
-            crawl_site = num_sites
-
-        # cute loading message
-        loadvar = StringVar()
-        loadvar.set("")
-        waitvar = StringVar()
-        waitvar.set("Loading " + str(crawl_site) + " Site(s) from https://elderscrolls.fandom.com"
-                                                   "/wiki/Locations_(Skyrim) (this may take a minute "
-                                                   "or two)" + loadvar.get())
-        label = Label(self.win, textvariable=waitvar)
-        label.pack(side=TOP, pady=10)
-
-        i = 0
-        loadmessagevar = StringVar()
-        loadmessagevar.set("")
-        loadmessagelabel = Label(self.win, textvariable=loadmessagevar)
-        loadmessagelabel.pack(pady=10)
-        loadingmessages = ["Oh man this is taking a while, but I promise it is loading :)",
-                           "Damn bro how many locations did you ask for?",
-                           "Great things come to those who wait :)",
-                           "I promise I am loading I am just trying to be respectful and not overload the servers :(",
-                           "( ͡° ͜ʖ ͡°)", "One day I will load...",
-                           "If you asked for or more than 562 you are going to be here for a few minutes lol.",
-                           "Veuillez patienter, merci beaucoup.",
-                           "While you wait check this out this link ahku.portfoliobox.net",
-                           "Here, while you wait reddit.com"]
-        while True:
-            if self.page_attr == "":
-                time.sleep(0.25)
-                loadvar.set("."*(i % 4))
-                waitvar.set("Loading " + str(crawl_site) + " Site(s) from https://elderscrolls.fandom.com"
-                                                           "/wiki/Locations_(Skyrim) (this may take a minute "
-                                                           "or two)" + loadvar.get())
-                i += 1
-                self.win.update()
-                if i % 25 == 0:
-                    loadmessagevar.set(random.choice(loadingmessages))
-                    loadmessagelabel.unbind("<Button-1>")
-                    if "ahku.portfoliobox.net" in loadmessagevar.get():
-                        loadmessagelabel.bind("<Button-1>", lambda e: webbrowser.open_new_tab("https://ahku.portfoliobox.net/"))
-                    elif "reddit.com" in loadmessagevar.get():
-                        loadmessagelabel.bind("<Button-1>",
-                                              lambda e: webbrowser.open_new_tab("https://www.reddit.com/"))
-                    if i % 50 == 0:
-                        loadmessagevar.set("")
-            else:
+                print("Okay crawling " + str(sites_crawl_amount) + " pages!(Note: If entered value exceeds total"
+                      + " number of pages, the program will default to the max number of pages.)\n")
                 break
+    crawler = Crawler("https://elderscrolls.fandom.com/wiki/Locations_(Skyrim)", sites_crawl_amount)
 
-    # initializes the actual crawl of websites and pushes data to page_attr to be used else where
-    # also loads up the main start page
-    def init_crawl(self, num_sites):
-        self.crawler = project_one_reis_gadsden.Crawler(
-            "https://elderscrolls.fandom.com/wiki/Locations_(Skyrim)", num_sites)
-        self.page_attr = self.crawler.page_attr
-        self.start_page()
 
-    # main page for program, this page includes some important labels such as
-    # reactive search
-    # list of all locations crawled
-    # hold distribution
-    # type distribution
-    # hold reference table
-    # Option for creating and viewing json
-    # A concrete way to exit
-    def start_page(self):
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # Entry to search that will dynamically update a StringVar in order to give reactive searching
-        label = Label(self.win, text="Search for locations here!")
-        label.pack()
-        self.e1var = StringVar()
-        self.e1var.trace('w', self.reactive_search)
-        search_entry = Entry(self.win, width=52, textvariable=self.e1var)
-        search_entry.pack(pady=10)
-
-        # Place holders for search results
-        self.s1var = StringVar()
-        self.s1var.set("")
-        self.search_label1 = Label(self.win, textvariable=self.s1var)
-        self.search_label1.pack(pady=10)
-
-        self.s2var = StringVar()
-        self.s2var.set("")
-        self.search_label2 = Label(self.win, textvariable=self.s2var)
-        self.search_label2.pack(pady=10)
-
-        self.s3var = StringVar()
-        self.s3var.set("")
-        self.search_label3 = Label(self.win, textvariable=self.s3var)
-        self.search_label3.pack(pady=10)
-
-        self.s4var = StringVar()
-        self.s4var.set("")
-        self.search_label4 = Label(self.win, textvariable=self.s4var)
-        self.search_label4.pack(pady=10)
-
-        self.s5var = StringVar()
-        self.s5var.set("")
-        self.search_label5 = Label(self.win, textvariable=self.s5var)
-        self.search_label5.pack(pady=10)
-
-        # Labels that lead to functions
-        all_label = Label(self.win, text="Check out all locations!", foreground="#0000ee", font='Verdana 11 underline')
-        all_label.pack(pady=10)
-        all_label.bind('<Button-1>', lambda e: self.view_all_results())
-
-        random_label = Label(self.win, text="Check out a random location!", foreground="#0000ee",
-                             font='Verdana 11 underline')
-
-        random_label.pack(pady=10)
-        random_label.bind('<Button-1>', lambda e: self.display_results(random.choice(list(self.page_attr.values())), 3))
-
-        hold_sum_label = Label(self.win, text="Check out the distributions of locations in each hold!",
-                               foreground="#0000ee", font='Verdana 11 underline')
-        hold_sum_label.pack(pady=10)
-        hold_sum_label.bind('<Button-1>', lambda e: self.render_hold_sum())
-
-        type_sum_label = Label(self.win, text="Check out the distributions of the types of locations!",
-                               foreground="#0000ee", font='Verdana 11 underline')
-        type_sum_label.pack(pady=10)
-        type_sum_label.bind('<Button-1>', lambda e: self.render_type_sum())
-
-        hold_label = Label(self.win, text="Check out the handy hold reference table!",
-                           foreground="#0000ee", font='Verdana 11 underline')
-        hold_label.pack(pady=10)
-        hold_label.bind('<Button-1>', lambda e: self.render_holds())
-
-        json_label = Label(self.win, text="View JSON", font='Verdana 11 underline', foreground="#0000ee")
-        json_label.pack(pady=10)
-        json_label.bind('<Button-1>', lambda e: self.json_run())
-
-        # Place holder variable for json dump label
-        self.json_var = StringVar()
-        self.json_var.set("")
-        dump_label = Label(self.win, textvariable=self.json_var)
-        dump_label.pack(pady=10)
-
-        quit_label = Label(self.win, text="Exit Skyrim Location Scraper", font='Verdana 11 underline',
-                           foreground="#0000ee")
-        quit_label.pack(pady=20)
-        quit_label.bind('<Button-1>', lambda e: self.quit())
-
-    # shows reactive searching and will get and display 5 locations that match the string currently in the entry box
-    def reactive_search(self, a, b, c):
-        search_results = self.search_results(self.e1var.get().lower().strip())
-
-        # conditional statements for reactive searching
-        if search_results[0] == "":  # handles case where a non matched string is in entry box
-            self.s1var.set("No results for your query!")
-            self.s2var.set("")
-            self.s3var.set("")
-            self.s4var.set("")
-            self.s5var.set("")
-            f1 = font.Font(self.search_label1, self.search_label1.cget("font"))
-            f1.configure(size=12, underline=False)
-            self.search_label1.configure(font=f1, foreground="#000000")
-            self.win.update()
-
-        elif self.e1var.get() == "":  # handles case where nothing is in entry box
-            self.s1var.set("")
-            self.s2var.set("")
-            self.s3var.set("")
-            self.s4var.set("")
-            self.s5var.set("")
-            self.win.update()
-
-        # handles matching cases for reactive search
-        else:
-            self.s1var.set("")
-            self.s2var.set("")
-            self.s3var.set("")
-            self.s4var.set("")
-            self.s5var.set("")
-
-            self.s1var.set(search_results[0]["Location Name: "])
-            f1 = font.Font(self.search_label1, self.search_label1.cget("font"))
-            f1.configure(underline=True, size=12)
-            self.search_label1.configure(font=f1, foreground="#0000ee")
-            self.search_label1.bind('<Button-1>', lambda e: self.display_results(search_results[0], 1))
-
-            if search_results[1] != "":
-                self.s2var.set(search_results[1]["Location Name: "])
-                f2 = font.Font(self.search_label2, self.search_label2.cget("font"))
-                f2.configure(underline=True, size=12)
-                self.search_label2.configure(font=f2, foreground="#0000ee")
-                self.search_label2.bind('<Button-1>', lambda e: self.display_results(search_results[1], 1))
-
-            if search_results[2] != "":
-                self.s3var.set(search_results[2]["Location Name: "])
-                f3 = font.Font(self.search_label3, self.search_label3.cget("font"))
-                f3.configure(underline=True, size=12)
-                self.search_label3.configure(font=f3, foreground="#0000ee")
-                self.search_label3.bind('<Button-1>', lambda e: self.display_results(search_results[2], 1))
-
-            if search_results[3] != "":
-                self.s4var.set(search_results[3]["Location Name: "])
-                f4 = font.Font(self.search_label4, self.search_label3.cget("font"))
-                f4.configure(underline=True, size=12)
-                self.search_label4.configure(font=f4, foreground="#0000ee")
-                self.search_label4.bind('<Button-1>', lambda e: self.display_results(search_results[3], 1))
-
-            if search_results[4] != "":
-                self.s5var.set(search_results[4]["Location Name: "])
-                f5 = font.Font(self.search_label5, self.search_label3.cget("font"))
-                f5.configure(underline=True, size=12)
-                self.search_label5.configure(font=f5, foreground="#0000ee")
-                self.search_label5.bind('<Button-1>', lambda e: self.display_results(search_results[4], 1))
-
-            self.win.update()  # updates the window to load searches
-
-    # main logic for handling the searches
-    # return all matching results, blank results if no matches, blank results if matches is less then 5 to fill up
-    # remaining indexes
-    def search_results(self, chars):
-        # array for holding all results
-        results = []
-
-        # variable i makes sure that search does not extend past 5
-        i = 0
-
-        # variable j makes sure that search does not extend past end of list
-        j = 0
-
-        # loop to populate results with at most 5 matches
-        while i < 4 and j < len(self.page_attr):
-            for key in self.page_attr:
-                if chars == self.page_attr[key]["Location Name: "][0:len(chars)].lower() and \
-                        self.page_attr[key] not in results:
-                    results.append(self.page_attr[key])
-                    i += 1
-                j += 1
-
-        # Fills unused list spots with blank string as to ensure len(results) is always 5
-        x = 5 - len(results)
-        while x > 0:
-            results.append("")
-            x -= 1
-        return results
-
-    # clears frame and shows the attributes of the selected location
-    # takes a directed_from_search argument in order to tell how it got there, important for viewing all results
-    # and for coming from random results
-    def display_results(self, val, directed_from):
-        # clear frame of all elements
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # loops through page_attrs in order to build page for location
-        for key, value in self.page_attr.items():
-            if val == value:
-                label_url = Label(self.win, text="Learn more here: " + key, foreground="#0000ee", font='Verdana 11 '
-                                                                                                       'underline')
-                label_url.pack(pady=10)
-                label_url.bind('<Button-1>', lambda e: webbrowser.open_new_tab(key))
-
-                label_name = Label(self.win, text="Location Name: " + self.page_attr[key]["Location Name: "], font=25)
-                label_name.pack(pady=10)
-
-                label_type = Label(self.win, text="Location Type: " + self.page_attr[key]["Location Type: "], font=25)
-                label_type.pack(pady=10)
-
-                label_hold = Label(self.win, text="Hold: " + self.page_attr[key]["Hold: "], font=25)
-                label_hold.pack(pady=10)
-
-                label_rel_loc = Label(self.win,
-                                      text="Relative Location: " + self.page_attr[key]["Relative Location: "], font=25)
-                label_rel_loc.pack(pady=10)
-
-                label_loc_id = Label(self.win, text="Location ID(s): " + self.page_attr[key]["Location ID(s): "],
-                                     wraplength=500, justify=CENTER, font=25)
-                label_loc_id.pack(pady=10)
-
-                label_sum = Label(self.win, text="Summary: " + self.page_attr[key]["Summary: "], wraplength=500,
-                                  justify=CENTER, font=25)
-                label_sum.pack(pady=10)
-
-                # case 1 - came here from reactive search
-                # case 2 - came here from "View All" page
-                # case 3 - came here from random location page
-
-                # came here from search page will only allow user to go back to search page
-                if directed_from == 1:
-                    label_back = Label(self.win, text="Search some more!", foreground="#0000ee",
-                                       font='Verdana 11 underline')
-                    label_back.pack(pady=10)
-                    label_back.bind('<Button-1>', lambda e: self.start_page())
-
-                # came here from view all page will only allow user to go back to view all page
-                elif directed_from == 2:
-                    label_back = Label(self.win, text="Go back to all results!", foreground="#0000ee", font='Verdana '
-                                                                                                            '11 '
-                                                                                                            'underline')
-                    label_back.pack(pady=10)
-                    label_back.bind('<Button-1>', lambda e: self.view_all_results())
-
-                # random location page results, will allow user to go to another random results or go back to search
-                else:
-                    label_back = Label(self.win, text="View another random!", foreground="#0000ee",
-                                       font='Verdana 11 underline')
-                    label_back.pack(pady=10)
-                    label_back.bind('<ButtonRelease-1>',
-                                    lambda e: self.display_results(random.choice(list(self.page_attr.values())), 3))
-
-                    label_go_back = Label(self.win, text="Go back to search!", foreground="#0000ee",
-                                          font='Verdana 11 underline')
-                    label_go_back.pack(pady=10)
-                    label_go_back.bind('<Button-1>', lambda e: self.start_page())
-
-    # builds a page that contain links to all locations that were crawled
-    def view_all_results(self):
-        # clear all elements from frame
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # Header
-        top_label = Label(self.win, text="All Locations Crawled")
-        tl = font.Font(top_label, top_label.cget("font"))
-        tl.configure(size=18)
-        top_label.configure(font=tl)
-        top_label.pack(pady=10)
-
-        # contains all labels created
-        labels = []
-
-        # contains location created
-        locations = []
-
-        # variable i is used to be able to pair up indexes of labels and locations list
-        i = 0
-
-        # loop that procedurally generates labels and binds them to location
-        for key in self.page_attr:
-            locations.append(self.page_attr[key])
-            labels.append(Label(self.win, text=self.page_attr[key]["Location Name: "], foreground="#0000ee",
-                                font='Verdana 11 underline'))
-            labels[i].bind("<Button-1>", lambda e, index=i: self.display_results(locations[index], 2))
-            labels[i].pack()
-            i += 1
-
-        label_back = Label(self.win, text="Go back to search!", foreground="#0000ee", font='Verdana 11 underline')
-        label_back.pack(pady=10)
-        label_back.bind('<Button-1>', lambda e: self.start_page())
-
-    # renders the hold reference table
-    def render_holds(self):
-        # clear elements in frame
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # formatted output from hold info gathered during crawl (format is still a mess but readable)
-        output = '{0:<20}\t{1:<20}\t{2:<20}\n\n'.format("Hold", "Capital City", "Jarl")
-        for hold in self.crawler.hold_list:
-            output += '{0:<20}\t{1:<20}\t{2:<20}\n' \
-                .format(hold, self.crawler.city_list[self.crawler.hold_list.index(hold)],
-                        self.crawler.jarl_list[self.crawler.hold_list.index(hold)])
-
-        hold_label = Label(self.win, text=output, font=25)
-        hold_label.pack()
-
-        label_back = Label(self.win, text="Back to search", foreground="#0000ee", font='Verdana 11 underline')
-        label_back.pack(pady=10)
-        label_back.bind('<Button-1>', lambda e: self.start_page())
-
-    # renders the hold summary table
-    def render_hold_sum(self):
-        # clear elements from frame
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # formatted output for hold summary (surprisingly okay formatting considering the other table)
-        hold_sum = self.crawler.get_hold_summary()
-        output = "{0:<35}\t{1:<20}{2:>32}\n\n".format("Hold", "Occurrences", "Percentage of Total Occurrences")
-        for key in hold_sum:
-            output += '{0:<35}\t{1:<20}{2:>32}\n'.format(key, hold_sum[key],
-                                                         str((hold_sum[key] / self.crawler.hold_sum) * 100) + "%")
-        hold_sum_label = Label(self.win, text=output, font=25)
-        hold_sum_label.pack()
-
-        label_back = Label(self.win, text="Back to search", foreground="#0000ee", font='Verdana 11 underline')
-        label_back.pack(pady=10)
-        label_back.bind('<Button-1>', lambda e: self.start_page())
-
-    # renders the type summary page
-    def render_type_sum(self):
-        # clear all elements in frame
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        # formatted output for type summary (this was literally the best i got it to look, but it still looks awful)
-        type_sum = self.crawler.get_type_summary()
-        output = "{0:<50}\t{1:<20}{2:>18}\n\n".format("Type", "Occurrences", "Percentage of Total Occurrences")
-        for key in type_sum:
-            output += "{0:<50}\t\t{1:<20}{2:>18}\n".format(key, type_sum[key],
-                                                           str((type_sum[key] / self.crawler.type_sum) * 100) + "%")
-
-        tslf = font.Font(size=12)
-        type_sum_label = Label(self.win, text=output, font=tslf)
-        type_sum_label.pack()
-
-        label_back = Label(self.win, text="Back to search", foreground="#0000ee", font='Verdana 11 underline')
-        label_back.pack(pady=10)
-        label_back.bind('<Button-1>', lambda e: self.start_page())
-
-    # will dump a file to json if has not already, and open up a file explorer window to the json file
-    # note: not sure if this works on OSs other then Windows
-    def json_run(self):
-        if not self.dumped:
-            self.crawler.dump_to_json()
-            subprocess.Popen(r'explorer /select, ".\data.json"')
-            self.json_var.set("Successfully outputted data to .json file!")
-            self.win.update()
-            self.dumped = True
-        else:
-            subprocess.Popen(r'explorer /select, ".\data.json"')
-            self.json_var.set("")
-            self.win.update()
-
-    # quits the program but displays a goodbye message before closing
-    def quit(self):
-        for child in self.win.winfo_children():
-            child.destroy()
-
-        goodbye = Label(self.win, text="Goodbye!\nThank you for using the Skyrim Location Scraper!",
-                        font="Verdana 30", justify=CENTER)
-        goodbye.pack()
-        self.master.after(2000, self.master.destroy)
-
-
-# main executions
-def main():
-    SkyrimLocGUI()
-    mainloop()
-
-
-# will execute the file if it is not being imported and run elsewhere
+# checks if file is the main aka not imported, and will run the main method if it is.
 if __name__ == "__main__":
     main()
