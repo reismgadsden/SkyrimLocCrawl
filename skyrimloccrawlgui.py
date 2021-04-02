@@ -431,6 +431,7 @@ class SkyrimLocGUI:
                                           font='Verdana 11 underline')
                     label_go_back.pack(pady=10)
                     label_go_back.bind('<Button-1>', lambda e: self.start_page())
+                break
 
     # builds a page that contain links to all locations that were crawled
     def view_all_results(self):
