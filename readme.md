@@ -1,7 +1,7 @@
 # Welcome to the Skyrim Location Crawler Documentation
 
 By: Reis M. Gadsden\
-Version: v1.01
+Version: v1.1.0
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -14,8 +14,16 @@ Version: v1.01
 3. [Starting for the first time](#starting)
     1. [Starting the Crawl](#initializing)
     2. [Walkthrough](#walkthrough)
-    3. [Exploring the Features](#features)
-4. [Methods, Fields, Classes](#methods)
+4. [Exploring the Features](#features)
+    1. [Reactive Search](#search)
+    2. [Check out all locations!](#all_loc)
+    3. [Check out a random location!](#rand_loc)
+    4. [Check out the distributions of locations in each hold!](hold_dist)
+    5. [Check out the distributions of the types of locations!](type_dist)
+    6. [Check out the handy hold reference table!](#hold_ref)
+    7. [View JSON](#json)
+    8. [Exit Skyrim Location Scraper](#exit)
+6. [Methods, Fields, Classes](#methods)
     1. [skyrimloccrawl.py](#crawl)
     2. [skyrimloccrawlgui.py](#gui)
 
@@ -28,9 +36,9 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 * <a name ="use"></a> <b>Use</b>: Mostly just a fun program for exploring locations in TESV: Skyrim, however the code does contain a lot of general use code that could be used to scrape other things on the wiki.
 
 # 2. <a name="setup"></a>Setup 
-### 1. <a name="python"></a>Install Python3
+## 1. <a name="python"></a>Install Python3
     * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/ </a>
-### 2. <a name="libs"></a>Install necessary Libraries
+## 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
 * BeautifulSoup
     *       C:\...\SkyrimLocCrawl>pip install bs4
@@ -63,7 +71,7 @@ Open up your local machines command prompt and navigate to the directory where y
 <i>Note: Most of these are included with Python, so unless you did a bare bones install most of these will already be included</i>
 
 # 3. <a name="starting"></a> Starting for the first time
-### 1. <a name="initializing"></a> Starting the program.
+## 1. <a name="initializing"></a> Starting the program.
 To start the program for the first time, simply type in the command prompt
 *       C:\...\SkyrimLocCrawl>python skyrimloccrawlgui.py
 Or simply run <i>skyrimloccrawlgui.py</i> in a Python IDE.
@@ -90,17 +98,31 @@ After this simply click the button that says <i>"Crawl"</i>, and as long as you 
 
 <img src="./markdownassets/loadingscreen.png" width="50%">
 <i>Note: Since this program actively crawls the website, it goes at a slow pace as to not overload the server. There for you might be on this screen for a while. However this page will display loading messages, to let you know it did not freeze.</i>
-
+<br/>
 <br/>
 Once the crawler is finished you will land on this page.
 
 
 <img src="./markdownassets/startpage.png" width="50%">
 
+# 4. <a name="features"></a>Exploring the features
+## 1. <a name="search"></a>Reactive Search
 
-## 3. <a name="features"></a>Exploring the features
+## 2. <a name="all_loc"></a>Check out all locations!
+
+## 3. <a name="rand_loc"></a>Check out a random location!
+
+## 4. <a name="hold_dist"></a>Check out the distributions of locations in each hold!
+
+## 5. <a name="type_dist"></a>Check out the distributions of the types of locations!
+
+## 6. <a name="hold_ref"></a>Check out the handy hold reference table!
+
+## 7. <a name="json"></a>View JSON
+
+## 8. <a name="exit"></a>Exit Skyrim Location Scraper
     
-# 4. <a name="methods"></a> Methods, Fields, Classes
+# 5. <a name="methods"></a> Methods, Fields, Classes
 ### 1. <a name="crawl"></a>Methods, fields, and classes in: <i>skyrimloccrawl.py</i>
 * <i>headers</i>
     * Main headers for the crawler, this tells the website what kind of machine you are running by default the value of headers is\
