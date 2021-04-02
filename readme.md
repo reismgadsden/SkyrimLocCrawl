@@ -230,12 +230,12 @@ Data.json will be formatted like as the following:
 {
 <br/>   "https://elderscrolls.fandom.com/wiki/First_Location)URL" :
 <br/>   {
-<br/>       "Location Name: ": <i>"First_Location_Name"</i>
-<br/>       "Location Type: ": <i>"First_Location_Type"</i>
-<br/>       "Hold: ": <i>"First_Location_Hold"</i>
-<br/>       "Relative Location: ": <i>"First_Relative_Location"</i>
-<br/>       "Location Name: ": <i>"First_Location_Name"</i>
-<br/>       "Location ID(s): ": <i>"First_Location_IDs"</i>
+<br/>       "Location Name: ": <i>"First_Location_Name"</i>,
+<br/>       "Location Type: ": <i>"First_Location_Type"</i>,
+<br/>       "Hold: ": <i>"First_Location_Hold"</i>,
+<br/>       "Relative Location: ": <i>"First_Relative_Location"</i>,
+<br/>       "Location Name: ": <i>"First_Location_Name"</i>,
+<br/>       "Location ID(s): ": <i>"First_Location_IDs"</i>,
 <br/>       "Summary: ": <i>"First_Location_Summary"</i>
 <br/>   },
 <br/>   .
@@ -243,12 +243,12 @@ Data.json will be formatted like as the following:
 <br/>   .
 <br/>   "https://elderscrolls.fandom.com/wiki/Last_LocationURL" :
 <br/>   {
-<br/>       "Location Name: ": <i>"Last_Location_Name"</i>
-<br/>       "Location Type: ": <i>"Last_Location_Type"</i>
-<br/>       "Hold: ": <i>"Last_Location_Hold"</i>
-<br/>       "Relative Location: ": <i>"Last_Relative_Location"</i>
-<br/>       "Location Name: ": <i>"Last_Location_Name"</i>
-<br/>       "Location ID(s): ": <i>"Last_Location_IDs"</i>
+<br/>       "Location Name: ": <i>"Last_Location_Name"</i>,
+<br/>       "Location Type: ": <i>"Last_Location_Type"</i>,
+<br/>       "Hold: ": <i>"Last_Location_Hold"</i>,
+<br/>       "Relative Location: ": <i>"Last_Relative_Location"</i>,
+<br/>       "Location Name: ": <i>"Last_Location_Name"</i>,
+<br/>       "Location ID(s): ": <i>"Last_Location_IDs"</i>,
 <br/>       "Summary: ": <i>"Last_Location_Summary"</i>
 <br/>   }
 <br/>}
