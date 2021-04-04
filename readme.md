@@ -1,3 +1,7 @@
+<p align="center">
+<img src="./markdownassets/skyrimloccrawlerlogo.png" width="75%">
+</p>
+
 # Welcome to the Skyrim Location Crawler Documentation
 
 By: Reis M. Gadsden\
