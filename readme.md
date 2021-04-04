@@ -42,7 +42,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 
 # 2. <a name="setup"></a>Setup 
 ## 1. <a name="python"></a>Install Python3
-    * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/ </a>
+* <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>
 ## 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
 * BeautifulSoup
@@ -232,8 +232,7 @@ If a .json has not already been created it will display a message and open up th
 Data.json will be formatted like the following:
 <pre><code>
 {
-<br/>   "https://elderscrolls.fandom.com/wiki/First_Location_URL" :
-<br/>   {
+<br/>   "https://elderscrolls.fandom.com/wiki/First_Location_URL" : {
 <br/>       "Location Name: ": <i>"First_Location_Name"</i>,
 <br/>       "Location Type: ": <i>"First_Location_Type"</i>,
 <br/>       "Hold: ": <i>"First_Location_Hold"</i>,
@@ -245,8 +244,7 @@ Data.json will be formatted like the following:
 <br/>   .
 <br/>   .
 <br/>   .
-<br/>   "https://elderscrolls.fandom.com/wiki/Last_LocationURL" :
-<br/>   {
+<br/>   "https://elderscrolls.fandom.com/wiki/Last_LocationURL" : {
 <br/>       "Location Name: ": <i>"Last_Location_Name"</i>,
 <br/>       "Location Type: ": <i>"Last_Location_Type"</i>,
 <br/>       "Hold: ": <i>"Last_Location_Hold"</i>,
@@ -272,7 +270,7 @@ If you choose the second option you will also be sent of with a nice little good
 # 5. <a name="methods"></a> Methods, Fields, Classes
 ### 1. <a name="crawl"></a>Methods, fields, and classes in: <i>skyrimloccrawl.py</i>
 * <i>headers</i>
-    * Main headers for the crawler, this tells the website what kind of machine you are running by default the value of headers is\
+    * Main headers for the crawler, this tells the website what kind of machine you are running by default the value of headers is
     <pre><code>headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'}</code></pre>
     However you should change it to your header to be friendly.
 * <i>rp</i>
