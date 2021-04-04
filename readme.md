@@ -5,7 +5,8 @@
 # Welcome to the Skyrim Location Crawler Documentation
 
 By: Reis M. Gadsden\
-Version: v1.1.0
+Current Version: v1.1.0\
+GitHub Page: <a href="https://github.com/reismgadsden/SkyrimLocCrawl">github.com/reismgadsden/SkyrimLocCrawl</a>
 
 ## Table of Contents
 1. [Overview](#overview)
