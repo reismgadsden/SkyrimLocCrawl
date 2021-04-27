@@ -46,6 +46,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>
 ## 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
+<i>Note: Most of these are included with Python, so unless you did a bare bones install most, if not all, of these will already be included. It is recommended you try to run the program first in order to see which packages are necessary to install.</i>
 * BeautifulSoup
     *       C:\...\SkyrimLocCrawl>pip install bs4
 * RobotFileParser
@@ -74,7 +75,6 @@ Open up your local machines command prompt and navigate to the directory where y
     *       C:\...\SkyrimLocCrawl>pip install bs4.tkitner,tix
 * Subprocess
     *       C:\...\SkyrimLocCrawl>pip install subprocess
-<i>Note: Most of these are included with Python, so unless you did a bare bones install most of these will already be included</i>
 
 # 3. <a name="starting"></a> Starting for the first time
 ## 1. <a name="initializing"></a> Starting the program.
