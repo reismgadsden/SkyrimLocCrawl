@@ -46,6 +46,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>
 ## 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
+<br/>
 <i>Note: Most of these are included with Python, so unless you did a bare bones install most, if not all, of these will already be included. It is recommended you try to run the program first in order to see which packages are necessary to install.</i>
 * BeautifulSoup
     *       C:\...\SkyrimLocCrawl>pip install bs4
