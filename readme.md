@@ -44,6 +44,7 @@ build a GUI that creates a more user friendly, navigable format for the idea.
 # 2. <a name="setup"></a>Setup 
 ## 1. <a name="python"></a>Install Python3
 * <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a>
+    * When installing you should look for a check box that say "Add Python 3.x.x to PATH" and select it
 ## 2. <a name="libs"></a>Install necessary Libraries
 Open up your local machines command prompt and navigate to the directory where you saved the files
 <br/>
