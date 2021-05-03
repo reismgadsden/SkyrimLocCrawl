@@ -5,6 +5,7 @@
 # Welcome to the Skyrim Location Crawler Documentation
 
 By: Reis M. Gadsden\
+[Contributors](#contrib)\
 Current Version: v1.1.0\
 GitHub Page: <a href="https://github.com/reismgadsden/SkyrimLocCrawl">github.com/reismgadsden/SkyrimLocCrawl</a>
 
@@ -29,9 +30,10 @@ GitHub Page: <a href="https://github.com/reismgadsden/SkyrimLocCrawl">github.com
     6. [Check out the handy hold reference table!](#hold_ref)
     7. [View JSON](#json)
     8. [Exit Skyrim Location Crawler](#exit)
-6. [Methods, Fields, Classes](#methods)
+5. [Methods, Fields, Classes](#methods)
     1. [skyrimloccrawl.py](#crawl)
     2. [skyrimloccrawlgui.py](#gui)
+6. [Contributors](#contrib)
 
 # 1. <a name="overview"></a>Overview 
 * <a name="purpose"></a> <b>Purpose</b>: This program will take data collected in a scrape from the locations on the Elder Scrolls Wiki page for Skyrim and
@@ -524,3 +526,14 @@ Main class of the crawler. Contains everything to do with the actual crawling of
 * main
     * Purpose
         * Create instance of SkyrimLocGUI and initialize the mainLoop for the GUI
+
+# 6. <a name="contrib"></a> Contributors
+Contributing to SkyrimLocCrawl can mean helping test the usability and features of the program, fixing the documentation, or fixing or adding new code to the program.
+
+The following people are listed as contributors:
+* Tony A.
+* Ryan Lewis
+* Okami
+* Neckum
+* Kira O.
+* Malcolm C.
