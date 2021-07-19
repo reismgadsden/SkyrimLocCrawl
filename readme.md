@@ -75,7 +75,7 @@ Open up your local machines command prompt and navigate to the directory where y
 * TKinter.ttk
     *       C:\...\SkyrimLocCrawl>pip install tkinter.ttk
 * TKinter.tix
-    *       C:\...\SkyrimLocCrawl>pip install bs4.tkitner,tix
+    *       C:\...\SkyrimLocCrawl>pip install tkitner.tix
 * Subprocess
     *       C:\...\SkyrimLocCrawl>pip install subprocess
 
